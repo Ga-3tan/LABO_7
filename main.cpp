@@ -13,33 +13,61 @@ Compilateur : g++ 7.4.0
 --------------------------- */
 #include <iostream>
 #include <string>
+#include <cmath>
 
 using namespace std;
 
 //test
-const string Alphabet = "IVXLCDM";
-int test (){
+const string ALPHABET = "IVXLCDM";
 
-}
-
-string getRomanString(int input, int power){
+string getRomanString(int input, int power) {
     string output;
-    switch(power){
-        case 0:
-
+    output = ALPHABET.at(power);
+    string nextPower;
+    nextPower = power < 6 ? string() + ALPHABET.at(power + 1) : string();
+    switch (input) {
         case 1:
+            return output;
+        case 2:
+            return output + output;
+        case 3:
+            return output + output + output;
+        case 4:
+            return power < 6 ? output + ALPHABET.at(power + 1) : output + output + output;
+        case 5:
+            return nextPower;
+        case 6:
+            return nextPower + output;
+        case 7:
+            return nextPower + output + output;
+        case 8:
+            return nextPower + output + output + output;
+        case 9:
+            nextPower = ALPHABET.at(power + 2);
+            return output + nextPower;
+        default:
+            return string();
     }
+
 }
 
-string decimalToRoman(int input){
+string decimalToRoman(int input) {
     string output;
     int power = 0;
-    do{
+    do {
+        output = getRomanString(input % 10, power * 2) + output;
         power++;
-    }while(input/=10);
+        input = log10(input);
+    } while (input);
+    return output;
 }
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+    while (true) {
+        int test;
+        cin >> test;
+        cout << decimalToRoman(test);
+
+    }
     return 0;
 }
