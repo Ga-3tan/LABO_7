@@ -18,6 +18,9 @@ using namespace std;
 
 //test
 const string Alphabet = "IVXLCDM";
+int test (){
+
+}
 
 string getRomanString(int input, int power){
     string output;
