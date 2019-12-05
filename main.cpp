@@ -33,7 +33,7 @@ string getRomanString(int input, int power) {
         case 3:
             return output + output + output;
         case 4:
-            return power < 6 ? output + ALPHABET.at(power + 1) : output + output + output;
+            return power < 6 ? output + ALPHABET.at(power + 1) : output + output + output + output;
         case 5:
             return nextPower;
         case 6:
@@ -54,11 +54,13 @@ string getRomanString(int input, int power) {
 string decimalToRoman(int input) {
     string output;
     int power = 0;
+    int nbIter = log10(input);
     do {
         output = getRomanString(input % 10, power * 2) + output;
         power++;
-        input = log10(input);
-    } while (input);
+        input = (input / 10);
+        nbIter--;
+    } while (nbIter >= 0);
     return output;
 }
 
