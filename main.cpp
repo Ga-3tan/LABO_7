@@ -20,6 +20,18 @@ using namespace std;
 //test
 const string ALPHABET = "IVXLCDM";
 
+
+/**
+ * Verify if an input is inside an interval (Bounds included)
+ * @param input the integer to check
+ * @param lowerBound the lower integer of the interval (included)
+ * @param upperBound the upper integer of the interval (included)
+ * @return a boolean, true if the input is inside [lowerBound, upperBound], false otherwise
+ */
+bool isBetweenBounds(int input, int lowerBound, int upperBound) {
+    return input >= lowerBound && input <= upperBound;
+}
+
 string getRomanString(int input, int power) {
     string output;
     output = ALPHABET.at(power);
