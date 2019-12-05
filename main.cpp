@@ -14,6 +14,7 @@ Compilateur : g++ 7.4.0
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <limits>
 
 using namespace std;
 
@@ -44,7 +45,7 @@ string getRomanString(int input, int power) {
         case 3:
             return output + output + output;
         case 4:
-            return power < 6 ? output + ALPHABET.at(power + 1) : output + output + output + output;
+            return power < 6 ? output + nextPower : output + output + output + output;
         case 5:
             return nextPower;
         case 6:
