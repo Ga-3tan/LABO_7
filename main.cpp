@@ -15,6 +15,7 @@ Compilateur : g++ 7.4.0
 #include <string>
 #include <cmath>
 #include <limits>
+#include <sstream>
 
 using namespace std;
 
@@ -86,12 +87,11 @@ int getIntFromRoman(char romanNumber){
     return 0;
 }
 
-int romanToDecimal(string input){
-    string test = "MMMMI";
+string romanToDecimal(string input) {
     int output = 0;
-    for (int i = test.length()-1; i >= 0; i--) {
-        int temp = getIntFromRoman(test[i]);
-        int temp2 = getIntFromRoman(test[i-1]);
+    for (int i = input.length() - 1; i >= 0; i--) {
+        int temp = getIntFromRoman(input[i]);
+        int temp2 = getIntFromRoman(input[i - 1]);
         if (temp2 < temp && i != 0) {
             output += temp - temp2;
             i--;
@@ -99,7 +99,7 @@ int romanToDecimal(string input){
             output += temp;
         }
     }
-    return output;
+    return to_string(output);
 }
 
 /**
@@ -112,7 +112,7 @@ int romanToDecimal(string input){
  * @param error a string to indicate the user that an error has occurred
  * @return the validated integer entered by the user
  */
-int validInput(int lowerBound, int upperBound, const string &question, const string &error) {
+int validInteger(int lowerBound, int upperBound, const string &question, const string &error) {
     bool valid;
     int input;
     do {
@@ -132,11 +132,66 @@ int validInput(int lowerBound, int upperBound, const string &question, const str
     return input;
 }
 
+bool validateRomanString(const string &input) {
+    // check if string composed of valid caracter
+    for (char s : input) {
+        bool isValid = false;
+        for (char t : ALPHABET) {
+            if (t == s) {
+                isValid = true;
+                break;
+            }
+        }
+        if (!isValid) {
+            return false;
+        }
+    }
+    int occurence = 0;
+    char prev_char = '-';
+    for (char s : input) {
+        occurence += prev_char == s;
+        prev_char = s;
+        if (occurence > 2 && s != ALPHABET.back()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+string getInput() {
+    bool valid;
+    int number;
+    bool romanToNumber = false;
+    string input;
+    do {
+        getline(cin, input);
+        if (input.empty()) {
+            return string();
+        }
+        stringstream ss(input);
+        if (ss >> number) {
+            char nextChar = ss.peek();
+            valid = isBetweenBounds(number, 1, 4999);
+            romanToNumber = false;
+        } else {
+            valid = validateRomanString(input);
+            romanToNumber = true;
+        }
+        if (!valid) {
+            cout << "Non valide" << endl;
+        }
+    } while (!valid);
+    string output = (romanToNumber ? romanToDecimal(input) : decimalToRoman(number));
+    return output;
+}
+
 int main() {
-    while (true) {
-        int test;
-        cin >> test;
-        cout << decimalToRoman(test);
+    string value;
+    bool stop = false;
+    while (!stop) {
+        value = getInput();
+        stop = value.empty();
+        cout << value << endl;
     }
     return 0;
 }
