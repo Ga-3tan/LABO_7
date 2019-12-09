@@ -175,47 +175,16 @@ bool validateRomanString(const string &input) {
             ++occurrence;
         }
 
-
         if (occurrence > 2 && s != ALPHABET.back()) {
             return false;
         }
-        bool temp = checkRomanOrder(s, prevChar);
-        if (prevChar != '-' && !temp) {
+        if (prevChar != '-' && !checkRomanOrder(s, prevChar)) {
             return false;
         }
         prevChar = s;
     }
     return true;
 }
-
-/**
- *
- *
-1
-I
-4
-IV
-8
-VIII
-19
-XIX
-65
-LXV
-421
-CDXXI
-1973
-MCMLXXIII
-MCMXLIV
-1944
-MMXV
-2015
-DCLXVI
-666
-CMXCIX
-999
-MCMIIII
-Non valide
- */
 
 string getInput() {
     bool valid;
