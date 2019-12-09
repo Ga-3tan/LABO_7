@@ -132,9 +132,33 @@ int validInteger(int lowerBound, int upperBound, const string &question, const s
     return input;
 }
 
+bool checkRomanOrder(char currentNumber, char previousNumber) {
+    switch (currentNumber) {
+        case 'D':
+            if (previousNumber == 'X') {
+                return false;
+            }
+        case 'L':
+        case 'C':
+            if (previousNumber == 'I' || previousNumber == 'L') {
+                return false;
+            }
+        case 'V':
+        case 'X':
+            if (previousNumber == 'V') {
+                return false;
+            }
+        default:
+            return true;
+
+    }
+}
+
 bool validateRomanString(const string &input) {
     // check if string composed of valid caracter
-    for (char s : input) {
+    unsigned occurrence = 0;
+    char prevChar = '-';
+    for (char s  : input) {
         bool isValid = false;
         for (char t : ALPHABET) {
             if (t == s) {
@@ -145,18 +169,53 @@ bool validateRomanString(const string &input) {
         if (!isValid) {
             return false;
         }
-    }
-    int occurence = 0;
-    char prev_char = '-';
-    for (char s : input) {
-        occurence += prev_char == s;
-        prev_char = s;
-        if (occurence > 2 && s != ALPHABET.back()) {
+        if (prevChar != s) {
+            occurrence = 0;
+        } else {
+            ++occurrence;
+        }
+
+
+        if (occurrence > 2 && s != ALPHABET.back()) {
             return false;
         }
+        bool temp = checkRomanOrder(s, prevChar);
+        if (prevChar != '-' && !temp) {
+            return false;
+        }
+        prevChar = s;
     }
     return true;
 }
+
+/**
+ *
+ *
+1
+I
+4
+IV
+8
+VIII
+19
+XIX
+65
+LXV
+421
+CDXXI
+1973
+MCMLXXIII
+MCMXLIV
+1944
+MMXV
+2015
+DCLXVI
+666
+CMXCIX
+999
+MCMIIII
+Non valide
+ */
 
 string getInput() {
     bool valid;
