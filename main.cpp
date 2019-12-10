@@ -66,6 +66,7 @@ string getInput();
 int main() {
     string value;
     bool stop = false;
+    // stop if empty string
     while (!stop) {
         value = getInput();
         stop = value.empty();
@@ -82,31 +83,34 @@ bool isBetweenBounds(int input, int lowerBound, int upperBound) {
 string getRomanString(int integer, int power) {
     const int THOUSAND_POWER = 6;
     const int NEXT_POWER_OF_TEN = 2;
-    string output;
+    string output, symbol, nextPower;
+
     power *= NEXT_POWER_OF_TEN; // transform power to get only symbol factor of ten (I,X,C,M)
-    output = ALPHABET.at(power);
-    string nextPower;
+    symbol = ALPHABET.at(power);
     nextPower = power < THOUSAND_POWER ? string() + ALPHABET.at(power + 1) : string();
+
     switch (integer) {
-        case 1:
-            return output;
-        case 2:
-            return output + output;
         case 3:
-            return output + output + output;
-        case 4: // IV XL CD
-            return power < THOUSAND_POWER ? output + nextPower : output + output + output + output;
-        case 5:
-            return nextPower;
-        case 6:
-            return nextPower + output;
-        case 7:
-            return nextPower + output + output;
+            output += symbol;
+        case 2:
+            output += symbol;
+        case 1:
+            output += symbol;
+            return output;
+        case 4: // IV (4) XL (45) CD (400) but MMMM (4000)
+            return power < THOUSAND_POWER ? symbol + nextPower : symbol + symbol + symbol + symbol;
         case 8:
-            return nextPower + output + output + output;
+            output += symbol;
+        case 7:
+            output += symbol;
+        case 6:
+            output += symbol;
+        case 5:
+            output = nextPower + output;
+            return output;
         case 9:
             nextPower = ALPHABET.at(power + NEXT_POWER_OF_TEN);
-            return output + nextPower;
+            return symbol + nextPower;
         default:
             return string();
     }
