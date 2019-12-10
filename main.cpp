@@ -1,10 +1,19 @@
 /* ---------------------------
-Laboratoire : <nn>
+Laboratoire : 07
 Fichier : main.cpp
-Auteur(s) : leonard
-Date : 12/5/19
+Auteur(s) : Besseau Austburger Zwick
+Date : 05/12/19
 
-But :
+But : Ecrire un programme convertissant les nombres écrits avec le système de numérotation
+indo-arabe en nombres romains et vice-versa. Il lit les entrées ligne par ligne et détecte
+dans quel sens doit s'effectuer la conversion. Si l'entrée est non valide, il écrit "Non valide".
+Il s'arrête quand il reçoit une ligne vide. Il doit être capable de traiter au moins des nombres
+entre I et MMMMCMXCIX, donc entre 1 et 4999.
+
+Bien que l'usage romain varie, nous ne considérons ici comme valide que les nombres romains écrits
+sans symbole se répétant plus de 3 fois, à l'exception du M. Ainsi 4 s'écrit IV et pas IIII,
+99 s'écrit XCIX et pas LXXXXVIIII.
+Les nombres romains ne respectant pas cette règle doivent être considérés non valides
 
 Remarque(s) :
 
@@ -17,7 +26,6 @@ Compilateur : g++ 7.4.0
 
 using namespace std;
 
-//test
 const string ALPHABET = "IVXLCDM";
 
 
@@ -49,7 +57,8 @@ string decimalToRoman(int input);
 /**
  * Get the numerical value of a roman character
  * @param romanNumber a char representing a roman character (I, V, X, L, C, D, M)
- * @return an integer with the corresponding value (I = 1, V = 5, X =10, L = 50, c = 100, D = 500, M = 1000)
+ * @return an integer with the corresponding value (I = 1, V = 5, X =10, L = 50, c = 100, D = 500, M = 1000).
+ * 0 if character is not a roman character
  */
 int getIntFromRoman(char romanNumber);
 
@@ -83,20 +92,24 @@ bool validateRomanString(const string &input);
 /**
  * Get and validates an input (between 1(I) and 4999 (MMMMCMXCIX)) from the user and transform it
  * from decimal numeral to Roman numeral or vice-versa.
+ * @param lowerBound the lower integer of the interval (included)
+ * @param upperBound the upper integer of the interval (included)
  * @param error The error message to display to the user when an incorrect input is entered
  * @attention if the user enters an empty string, the empty string is returned
  * @return a string containing the transformed input
  */
-string getInput(const string &error);
+string getInput(int lowerBound, int upperBound, const string &error);
 
 
 int main() {
+    const string ERROR = "Non valide";
+    const int LOWER_BOUND = 1;
+    const int UPPER_BOUND = 4999;
     string value;
-    const string error = "Non valide";
     bool stop = false;
     // stop if empty string
     while (!stop) {
-        value = getInput(error);
+        value = getInput(LOWER_BOUND, UPPER_BOUND, ERROR);
         stop = value.empty();
         cout << value << endl;
     }
@@ -115,6 +128,7 @@ string getRomanSymbol(int integer, int power) {
 
     power *= NEXT_POWER_OF_TEN; // transform power to get only symbol factor of ten (I,X,C,M)
     symbol = ALPHABET.at(power);
+    // avoid out of bounds if power is 6 (input = n*1000)
     nextPower = power < THOUSAND_POWER ? string() + ALPHABET.at(power + 1) : string();
 
     switch (integer) {
@@ -147,6 +161,7 @@ string getRomanSymbol(int integer, int power) {
 string decimalToRoman(int input) {
     string output;
     int power = 0;
+    // Roman representation digit by digit
     do {
         output = getRomanSymbol(input % 10, power) + output;
         power++;
@@ -170,10 +185,13 @@ int getIntFromRoman(char romanNumber) {
             return 500;
         case 'M':
             return 1000;
+        default:
+            return 0;
     }
 }
 
 bool checkRomanOrder(char currentNumber, char previousNumber) {
+    // Check if rule of precedence is respected (bigger numbers first except for subtraction)
     switch (currentNumber) {
         case 'M':
         case 'D':
@@ -197,6 +215,9 @@ bool checkRomanOrder(char currentNumber, char previousNumber) {
 
 
 bool validateRomanString(const string &input) {
+    const unsigned OCCURENCE_MAX = 2;
+    const unsigned OCCURENCE_MAX_M = 3;
+
     unsigned occurrence = 0;
     char prevChar = '-';
 
@@ -220,8 +241,8 @@ bool validateRomanString(const string &input) {
         }
 
         //Verify number of occurrence
-        if (occurrence > 2) {
-            if (s != ALPHABET.back() || occurrence > 3) {
+        if (occurrence > OCCURENCE_MAX) {
+            if (s != ALPHABET.back() || occurrence > OCCURENCE_MAX_M) {
                 return false;
             }
         }
@@ -247,24 +268,28 @@ bool validateRomanString(const string &input) {
 
 int romanToDecimal(const string &input) {
     int output = 0;
-    int sous = 0;
+    int previous_subtraction = 0;
     if (input.length() > 1) {
         for (size_t i = 0; i < input.length() - 1; ++i) {
             int firstChar = getIntFromRoman(input[i]);
             int secondChar = getIntFromRoman(input[i + 1]);
             if (firstChar < secondChar) {
-                sous = firstChar;
+                previous_subtraction = firstChar;
                 output += -firstChar;
             } else {
-                if (secondChar == sous) {
+                // if addition is the opposite of the precedent subtraction, the number is invalid
+                if (secondChar == previous_subtraction) {
                     return -1;
                 }
                 output += firstChar;
             }
         }
-        if (input[input.length() - 1] == sous) {
+        // Check addition subtraction for last element
+        if (input[input.length() - 1] == previous_subtraction) {
+            // -1 is to signal error
             return -1;
         }
+        // add last element to total
         output += getIntFromRoman(input[input.length() - 1]);
         return output;
     } else {
@@ -272,20 +297,19 @@ int romanToDecimal(const string &input) {
     }
 }
 
-string getInput(const string &error) {
-    bool valid;
+string getInput(int lowerBound, int upperBound, const string &error) {
+    bool valid, romanToNumber;
     int number;
-    bool romanToNumber = false;
-    string input;
+    string input, output;
+
     do {
         getline(cin, input);
-        if (input.empty()) {
+        if (input.empty()) { // return empty string to signal end
             return string();
         }
         stringstream ss(input);
-        if (ss >> number) {
-            char nextChar = ss.peek();
-            valid = isBetweenBounds(number, 1, 4999);
+        if (ss >> number) { // test if number
+            valid = isBetweenBounds(number, lowerBound, upperBound);
             romanToNumber = false;
         } else {
             valid = validateRomanString(input);
@@ -296,12 +320,13 @@ string getInput(const string &error) {
         }
 
     } while (!valid);
-    string output;
+
     if (romanToNumber) {
         int value = romanToDecimal(input);
         output = (value == -1 ? error : to_string(value));
     } else {
         output = decimalToRoman(number);
     }
+
     return output;
 }
