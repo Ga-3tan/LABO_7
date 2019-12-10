@@ -220,12 +220,15 @@ bool validateRomanString(const string &input) {
             }
         }
     }
-
+    bool test[]{false, false, false, false, false, false, false};
     //I, V, X, L, C, D, M
     for (char c : input) {
-        bool test[]{false, false, false, false, false, false, false};
+
         switch (c) {
             case 'I':
+                if (test[2] && test[0]) {
+                    return false;
+                }
                 test[0] = true;
                 break;
             case 'V':
@@ -235,7 +238,7 @@ bool validateRomanString(const string &input) {
                 test[1] = true;
                 break;
             case 'X':
-                if (test[1] || (test[2] && test[0])) {
+                if (test[2] && test[4]) {
                     return false;
                 }
                 test[2] = true;
@@ -244,9 +247,15 @@ bool validateRomanString(const string &input) {
                 test[3] = true;
                 break;
             case 'C':
+                if (test[4] && (test[5] || test[6])) {
+                    return false;
+                }
                 test[4] = true;
                 break;
             case 'D':
+                if (test[5] && test[6]) {
+                    return false;
+                }
                 test[5] = true;
                 break;
             case 'M':
