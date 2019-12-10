@@ -30,14 +30,19 @@ const string ALPHABET = "IVXLCDM";
 bool isBetweenBounds(int input, int lowerBound, int upperBound);
 
 /**
- * Get the roman representation from a number
- * @param integer
- * @param power the exponent of the integer
- * @example
+ * Get the roman representation of a number
+ * @param integer the integer to represent must be between 0 and 10 (n %10)
+ * @param power the exponent of the integer (0 for digit, 1 for decade, 2 for hundred, 3 for thousand)
+ * @example 6= VI, 40 = XL, 700 = DCC
  * @return a string containing the roman representation of the number
  */
 string getRomanString(int integer, int power);
 
+/**
+ * Convert an integer into its roman representation
+ * @param input an integer between 1 and 4999
+ * @return a string with the roman representation of the integer
+ */
 string decimalToRoman(int input);
 
 int getIntFromRoman(char romanNumber);
