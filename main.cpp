@@ -14,7 +14,6 @@ Compilateur : g++ 7.4.0
 #include <iostream>
 #include <string>
 #include <cmath>
-#include <limits>
 #include <sstream>
 
 using namespace std;
@@ -29,16 +28,52 @@ const string ALPHABET = "IVXLCDM";
  * @param upperBound the upper integer of the interval (included)
  * @return a boolean, true if the input is inside [lowerBound, upperBound], false otherwise
  */
+bool isBetweenBounds(int input, int lowerBound, int upperBound);
+
+/**
+ * Get the roman representation from a number
+ * @param integer
+ * @param power the exponent of the integer
+ * @example
+ * @return a string containing the roman representation of the number
+ */
+string getRomanString(int integer, int power);
+
+string decimalToRoman(int input);
+
+int getIntFromRoman(char romanNumber);
+
+string romanToDecimal(string input);
+
+bool checkRomanOrder(char currentNumber, char previousNumber);
+
+bool validateRomanString(const string &input);
+
+string getInput();
+
+int main() {
+    string value;
+    bool stop = false;
+    while (!stop) {
+        value = getInput();
+        stop = value.empty();
+        cout << value << endl;
+    }
+    return 0;
+}
+
+
 bool isBetweenBounds(int input, int lowerBound, int upperBound) {
     return input >= lowerBound && input <= upperBound;
 }
 
-string getRomanString(int input, int power) {
+string getRomanString(int integer, int power) {
     string output;
+    power *= 2;
     output = ALPHABET.at(power);
     string nextPower;
     nextPower = power < 6 ? string() + ALPHABET.at(power + 1) : string();
-    switch (input) {
+    switch (integer) {
         case 1:
             return output;
         case 2:
@@ -63,29 +98,37 @@ string getRomanString(int input, int power) {
     }
 }
 
+
 string decimalToRoman(int input) {
     string output;
     int power = 0;
-    int nbIter = log10(input);
     do {
-        output = getRomanString(input % 10, power * 2) + output;
+        output = getRomanString(input % 10, power) + output;
         power++;
-    }while(input/=10);
+    } while (input /= 10);
     return output;
 }
 
-int getIntFromRoman(char romanNumber){
+int getIntFromRoman(char romanNumber) {
     switch (romanNumber) {
-        case 'I': return 1;
-        case 'V': return 5;
-        case 'X': return 10;
-        case 'L': return 50;
-        case 'C': return 100;
-        case 'D': return 500;
-        case 'M': return 1000;
+        case 'I':
+            return 1;
+        case 'V':
+            return 5;
+        case 'X':
+            return 10;
+        case 'L':
+            return 50;
+        case 'C':
+            return 100;
+        case 'D':
+            return 500;
+        case 'M':
+            return 1000;
     }
     return 0;
 }
+
 
 string romanToDecimal(string input) {
     int output = 0;
@@ -100,36 +143,6 @@ string romanToDecimal(string input) {
         }
     }
     return to_string(output);
-}
-
-/**
- * Ask a valid input in an interval to the user
- * @details ask an input in the interval from the user and validates it.
- * If the input is invalid, loop until the input is valid.
- * @param lowerBound the lower integer of the interval (included)
- * @param upperBound the upper integer of the interval (included)
- * @param question a string containing the question to ask the user
- * @param error a string to indicate the user that an error has occurred
- * @return the validated integer entered by the user
- */
-int validInteger(int lowerBound, int upperBound, const string &question, const string &error) {
-    bool valid;
-    int input;
-    do {
-        cin >> input;
-        //check if next stream entry is empty
-        char nextChar = cin.peek();
-        valid = !cin.fail() && isBetweenBounds(input, lowerBound, upperBound) &&
-                (nextChar == '\n' || nextChar == ' ' || nextChar == '\t');
-
-        if (!valid) {
-            cout << error << endl;
-        }
-        //clear buffer
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    } while (!valid);
-    return input;
 }
 
 bool checkRomanOrder(char currentNumber, char previousNumber) {
@@ -153,6 +166,7 @@ bool checkRomanOrder(char currentNumber, char previousNumber) {
 
     }
 }
+
 
 bool validateRomanString(const string &input) {
     // check if string composed of valid caracter
@@ -211,15 +225,4 @@ string getInput() {
     } while (!valid);
     string output = (romanToNumber ? romanToDecimal(input) : decimalToRoman(number));
     return output;
-}
-
-int main() {
-    string value;
-    bool stop = false;
-    while (!stop) {
-        value = getInput();
-        stop = value.empty();
-        cout << value << endl;
-    }
-    return 0;
 }
