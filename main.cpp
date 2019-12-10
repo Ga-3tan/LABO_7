@@ -31,13 +31,13 @@ const string ALPHABET = "IVXLCDM";
 bool isBetweenBounds(int input, int lowerBound, int upperBound);
 
 /**
- * Get the roman representation of a number
+ * Get the roman symbol of a number
  * @param integer the integer to represent must be between 0 and 10 (n %10)
  * @param power the exponent of the integer (0 for digit, 1 for decade, 2 for hundred, 3 for thousand)
  * @example 6= VI, 40 = XL, 700 = DCC
  * @return a string containing the roman representation of the number
  */
-string getRomanString(int integer, int power);
+string getRomanSymbol(int integer, int power);
 
 /**
  * Convert an integer into its roman representation
@@ -46,8 +46,19 @@ string getRomanString(int integer, int power);
  */
 string decimalToRoman(int input);
 
+/**
+ * Get the numerical value of a roman character
+ * @param romanNumber a char representing a roman character (I, V, X, L, C, D, M)
+ * @return an integer with the corresponding value (I = 1, V = 5, X =10, L = 50, c = 100, D = 500, M = 1000)
+ */
 int getIntFromRoman(char romanNumber);
 
+/**
+ * Computes the integer value of a roman representation
+ * @param input a string containing the roman representation
+ * @attention returns -1 if the number is not valid, By example IVI returns -1
+ * @return an integer containing the value. -1 if error
+ */
 int romanToDecimal(const string &input);
 
 /**
@@ -58,17 +69,34 @@ int romanToDecimal(const string &input);
  */
 bool checkRomanOrder(char currentNumber, char previousNumber);
 
+/**
+ * Verify if a string correspond to a roman numeral representation
+ * @param input a string
+ * @details Verify if input is constituted only from valid characters, if characters do not repeat too many times
+ * if characters are in decreasing order (no I before M etc).
+ * @attention No check to verify if addition subtraction rules is respected.
+ * By example IVI is considered as valid by this function. For verification of this case see @function romanToDecimal
+ * @return true if input is valid
+ */
 bool validateRomanString(const string &input);
 
-string getInput();
+/**
+ * Get and validates an input (between 1(I) and 4999 (MMMMCMXCIX)) from the user and transform it
+ * from decimal numeral to Roman numeral or vice-versa.
+ * @param error The error message to display to the user when an incorrect input is entered
+ * @attention if the user enters an empty string, the empty string is returned
+ * @return a string containing the transformed input
+ */
+string getInput(const string &error);
 
 
 int main() {
     string value;
+    const string error = "Non valide";
     bool stop = false;
     // stop if empty string
     while (!stop) {
-        value = getInput();
+        value = getInput(error);
         stop = value.empty();
         cout << value << endl;
     }
@@ -80,7 +108,7 @@ bool isBetweenBounds(int input, int lowerBound, int upperBound) {
     return input >= lowerBound && input <= upperBound;
 }
 
-string getRomanString(int integer, int power) {
+string getRomanSymbol(int integer, int power) {
     const int THOUSAND_POWER = 6;
     const int NEXT_POWER_OF_TEN = 2;
     string output, symbol, nextPower;
@@ -120,7 +148,7 @@ string decimalToRoman(int input) {
     string output;
     int power = 0;
     do {
-        output = getRomanString(input % 10, power) + output;
+        output = getRomanSymbol(input % 10, power) + output;
         power++;
     } while (input /= 10);
     return output;
@@ -244,7 +272,7 @@ int romanToDecimal(const string &input) {
     }
 }
 
-string getInput() {
+string getInput(const string &error) {
     bool valid;
     int number;
     bool romanToNumber = false;
@@ -264,11 +292,10 @@ string getInput() {
             romanToNumber = true;
         }
         if (!valid) {
-            cout << "Non valide" << endl;
+            cout << error << endl;
         }
 
     } while (!valid);
-    string error = "Non valide";
     string output;
     if (romanToNumber) {
         int value = romanToDecimal(input);
