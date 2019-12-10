@@ -80,11 +80,13 @@ bool isBetweenBounds(int input, int lowerBound, int upperBound) {
 }
 
 string getRomanString(int integer, int power) {
+    const int THOUSAND_POWER = 6;
+    const int NEXT_POWER_OF_TEN = 2;
     string output;
-    power *= 2;
+    power *= NEXT_POWER_OF_TEN; // transform power to get only symbol factor of ten (I,X,C,M)
     output = ALPHABET.at(power);
     string nextPower;
-    nextPower = power < 6 ? string() + ALPHABET.at(power + 1) : string();
+    nextPower = power < THOUSAND_POWER ? string() + ALPHABET.at(power + 1) : string();
     switch (integer) {
         case 1:
             return output;
@@ -92,8 +94,8 @@ string getRomanString(int integer, int power) {
             return output + output;
         case 3:
             return output + output + output;
-        case 4:
-            return power < 6 ? output + nextPower : output + output + output + output;
+        case 4: // IV XL CD
+            return power < THOUSAND_POWER ? output + nextPower : output + output + output + output;
         case 5:
             return nextPower;
         case 6:
@@ -103,10 +105,10 @@ string getRomanString(int integer, int power) {
         case 8:
             return nextPower + output + output + output;
         case 9:
-            nextPower = ALPHABET.at(power + 2);
+            nextPower = ALPHABET.at(power + NEXT_POWER_OF_TEN);
             return output + nextPower;
         default:
-            return output;
+            return string();
     }
 }
 
@@ -144,11 +146,8 @@ int getIntFromRoman(char romanNumber) {
 bool checkRomanOrder(char currentNumber, char previousNumber) {
     switch (currentNumber) {
         case 'M':
-            if (previousNumber == 'D') {
-                return false;
-            }
         case 'D':
-            if (previousNumber == 'X') {
+            if (previousNumber == 'X' || previousNumber == 'D') {
                 return false;
             }
         case 'L':
@@ -168,12 +167,12 @@ bool checkRomanOrder(char currentNumber, char previousNumber) {
 
 
 bool validateRomanString(const string &input) {
-    // check if string composed of valid caracter
     unsigned occurrence = 0;
     char prevChar = '-';
+
     for (char s  : input) {
         bool isValid = false;
-        //Verify invalid character
+        // Verify if invalid character are in the string
         for (char t : ALPHABET) {
             if (t == s) {
                 isValid = true;
@@ -183,22 +182,33 @@ bool validateRomanString(const string &input) {
         if (!isValid) {
             return false;
         }
+        // Compute number of occurrence
         if (prevChar != s) {
             occurrence = 0;
         } else {
             ++occurrence;
         }
 
+        //Verify number of occurrence
         if (occurrence > 2) {
             if (s != ALPHABET.back() || occurrence > 3) {
                 return false;
             }
         }
+        // Check if order of letter is correct
         if (prevChar != '-' && !checkRomanOrder(s, prevChar)) {
             return false;
         }
         prevChar = s;
     }
+    for (size_t i = 0; i < input.length() - 2; ++i) {
+        int a = getIntFromRoman(input[i + 2]);
+        int b = getIntFromRoman(input[i]);
+        if (a > b) {
+            return false;
+        }
+    }
+
     return true;
 }
 
