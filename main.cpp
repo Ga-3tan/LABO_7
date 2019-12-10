@@ -20,6 +20,7 @@ using namespace std;
 //test
 const string ALPHABET = "IVXLCDM";
 
+
 /**
  * Verify if an input is inside an interval (Bounds included)
  * @param input the integer to check
@@ -47,7 +48,7 @@ string decimalToRoman(int input);
 
 int getIntFromRoman(char romanNumber);
 
-string romanToDecimal(string input);
+int romanToDecimal(const string &input);
 
 /**
  * Check if two adjacent Roman number are in the correct order
@@ -60,6 +61,7 @@ bool checkRomanOrder(char currentNumber, char previousNumber);
 bool validateRomanString(const string &input);
 
 string getInput();
+
 
 int main() {
     string value;
@@ -139,25 +141,12 @@ int getIntFromRoman(char romanNumber) {
     return 0;
 }
 
-
-string romanToDecimal(string input) {
-    int output = 0;
-    for (int i = input.length() - 1; i >= 0; i--) {
-        int temp = getIntFromRoman(input[i]);
-        int temp2 = getIntFromRoman(input[i - 1]);
-        if (temp2 < temp && i != 0) {
-            output += temp - temp2;
-            i--;
-        } else {
-            output += temp;
-        }
-    }
-    return to_string(output);
-}
-
 bool checkRomanOrder(char currentNumber, char previousNumber) {
     switch (currentNumber) {
         case 'M':
+            if (previousNumber == 'D') {
+                return false;
+            }
         case 'D':
             if (previousNumber == 'X') {
                 return false;
@@ -184,6 +173,7 @@ bool validateRomanString(const string &input) {
     char prevChar = '-';
     for (char s  : input) {
         bool isValid = false;
+        //Verify invalid character
         for (char t : ALPHABET) {
             if (t == s) {
                 isValid = true;
@@ -209,61 +199,34 @@ bool validateRomanString(const string &input) {
         }
         prevChar = s;
     }
-    for (size_t i = 0; i < input.length(); ++i) {
-        char current = input.at(i);
-        if (current == 'M') {
-            continue;
-        }
-        for (size_t j = i; j < input.length(); ++j) {
-            if (!checkRomanOrder(input[j], current)) {
-                return false;
+    return true;
+}
+
+int romanToDecimal(const string &input) {
+    int output = 0;
+    int sous = 0;
+    if (input.length() > 1) {
+        for (size_t i = 0; i < input.length() - 1; ++i) {
+            int firstChar = getIntFromRoman(input[i]);
+            int secondChar = getIntFromRoman(input[i + 1]);
+            if (firstChar < secondChar) {
+                sous = firstChar;
+                output += -firstChar;
+            } else {
+                if (secondChar == sous) {
+                    return -1;
+                }
+                output += firstChar;
             }
         }
-    }
-    bool test[]{false, false, false, false, false, false, false};
-    //I, V, X, L, C, D, M
-    for (char c : input) {
-
-        switch (c) {
-            case 'I':
-                if (test[2] && test[0]) {
-                    return false;
-                }
-                test[0] = true;
-                break;
-            case 'V':
-                if (test[1]) {
-                    return false;
-                }
-                test[1] = true;
-                break;
-            case 'X':
-                if (test[2] && test[4]) {
-                    return false;
-                }
-                test[2] = true;
-                break;
-            case 'L':
-                test[3] = true;
-                break;
-            case 'C':
-                if (test[4] && (test[5] || test[6])) {
-                    return false;
-                }
-                test[4] = true;
-                break;
-            case 'D':
-                if (test[5] && test[6]) {
-                    return false;
-                }
-                test[5] = true;
-                break;
-            case 'M':
-                test[6] = true;
-                break;
+        if (input[input.length() - 1] == sous) {
+            return -1;
         }
+        output += getIntFromRoman(input[input.length() - 1]);
+        return output;
+    } else {
+        return getIntFromRoman(input[0]);
     }
-    return true;
 }
 
 string getInput() {
@@ -288,7 +251,15 @@ string getInput() {
         if (!valid) {
             cout << "Non valide" << endl;
         }
+
     } while (!valid);
-    string output = (romanToNumber ? romanToDecimal(input) : decimalToRoman(number));
+    string error = "Non valide";
+    string output;
+    if (romanToNumber) {
+        int value = romanToDecimal(input);
+        output = (value == -1 ? error : to_string(value));
+    } else {
+        output = decimalToRoman(number);
+    }
     return output;
 }
