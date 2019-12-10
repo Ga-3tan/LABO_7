@@ -116,7 +116,6 @@ string getRomanString(int integer, int power) {
     }
 }
 
-
 string decimalToRoman(int input) {
     string output;
     int power = 0;
@@ -144,7 +143,6 @@ int getIntFromRoman(char romanNumber) {
         case 'M':
             return 1000;
     }
-    return 0;
 }
 
 bool checkRomanOrder(char currentNumber, char previousNumber) {
@@ -205,11 +203,14 @@ bool validateRomanString(const string &input) {
         }
         prevChar = s;
     }
-    for (size_t i = 0; i < input.length() - 2; ++i) {
-        int a = getIntFromRoman(input[i + 2]);
-        int b = getIntFromRoman(input[i]);
-        if (a > b) {
-            return false;
+    // check
+    if (input.length() > 1) {
+        for (size_t i = 0; i < input.length() - 2; ++i) {
+            int a = getIntFromRoman(input[i + 2]);
+            int b = getIntFromRoman(input[i]);
+            if (a > b) {
+                return false;
+            }
         }
     }
 
