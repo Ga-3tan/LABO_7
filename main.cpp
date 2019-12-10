@@ -214,10 +214,44 @@ bool validateRomanString(const string &input) {
         if (current == 'M') {
             continue;
         }
-        for (size_t j = i + 1; j < input.length(); ++j) {
+        for (size_t j = i; j < input.length(); ++j) {
             if (!checkRomanOrder(input[j], current)) {
                 return false;
             }
+        }
+    }
+
+    //I, V, X, L, C, D, M
+    for (char c : input) {
+        bool test[]{false, false, false, false, false, false, false};
+        switch (c) {
+            case 'I':
+                test[0] = true;
+                break;
+            case 'V':
+                if (test[1]) {
+                    return false;
+                }
+                test[1] = true;
+                break;
+            case 'X':
+                if (test[1] || (test[2] && test[0])) {
+                    return false;
+                }
+                test[2] = true;
+                break;
+            case 'L':
+                test[3] = true;
+                break;
+            case 'C':
+                test[4] = true;
+                break;
+            case 'D':
+                test[5] = true;
+                break;
+            case 'M':
+                test[6] = true;
+                break;
         }
     }
     return true;
