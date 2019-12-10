@@ -13,7 +13,6 @@ Compilateur : g++ 7.4.0
 --------------------------- */
 #include <iostream>
 #include <string>
-#include <cmath>
 #include <sstream>
 
 using namespace std;
@@ -189,8 +188,10 @@ bool validateRomanString(const string &input) {
             ++occurrence;
         }
 
-        if (occurrence > 2 && s != ALPHABET.back()) {
-            return false;
+        if (occurrence > 2) {
+            if (s != ALPHABET.back() || occurrence > 3) {
+                return false;
+            }
         }
         if (prevChar != '-' && !checkRomanOrder(s, prevChar)) {
             return false;
