@@ -49,6 +49,12 @@ int getIntFromRoman(char romanNumber);
 
 string romanToDecimal(string input);
 
+/**
+ * Check if two adjacent Roman number are in the correct order
+ * @param currentNumber the first character to compare
+ * @param previousNumber the second character to compare
+ * @return true if the order is valid, false otherwise
+ */
 bool checkRomanOrder(char currentNumber, char previousNumber);
 
 bool validateRomanString(const string &input);
@@ -98,7 +104,7 @@ string getRomanString(int integer, int power) {
             nextPower = ALPHABET.at(power + 2);
             return output + nextPower;
         default:
-            return string();
+            return output;
     }
 }
 
@@ -151,6 +157,7 @@ string romanToDecimal(string input) {
 
 bool checkRomanOrder(char currentNumber, char previousNumber) {
     switch (currentNumber) {
+        case 'M':
         case 'D':
             if (previousNumber == 'X') {
                 return false;
@@ -167,7 +174,6 @@ bool checkRomanOrder(char currentNumber, char previousNumber) {
             }
         default:
             return true;
-
     }
 }
 
@@ -202,6 +208,17 @@ bool validateRomanString(const string &input) {
             return false;
         }
         prevChar = s;
+    }
+    for (size_t i = 0; i < input.length(); ++i) {
+        char current = input.at(i);
+        if (current == 'M') {
+            continue;
+        }
+        for (size_t j = i + 1; j < input.length(); ++j) {
+            if (!checkRomanOrder(input[j], current)) {
+                return false;
+            }
+        }
     }
     return true;
 }
